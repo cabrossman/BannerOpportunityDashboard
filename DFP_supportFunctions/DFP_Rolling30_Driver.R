@@ -31,12 +31,33 @@ DFP_Rolling30_Driver <- function(){
   #filter lines which where active in last 30 days
   # linesNames <- lines[ifelse(is.na(lines$endYMD),99999999,lines$endYMD) >= startYMD & ifelse(is.na(lines$startYMD),-99999999,lines$startYMD) <= endYMD, 3]
   # 
-  print("downloading delivery")
+  print("downloading network delivery")
+  marineLines <- DFP_getAllMarineLineItems()
+  networkLines <- marineLines %>% filter(grepl("^adx",name,ignore.case = TRUE))
+  
+  
+  filter = paste0("WHERE LINE_ITEM_NAME IN (", 
+                  paste0(paste0("'",networkLines$name,"'"), collapse=','), 
+                  ")")
+  
+  
+  dfpNetworkAds <- DFP_getDeliveryInfo(start_year = start_year, start_month = start_month, start_day = start_day,
+                                       end_year = end_year, end_month = end_month, end_day = end_day,
+                                       filter = filter, column = 'TOTAL_LINE_ITEM_LEVEL_IMPRESSIONS')
+  
+  network_pagePos <- dfpNetworkAds$pagePos_data
+  network_geo <- dfpNetworkAds$geo_data
+  
+  #rename for binding
+  names(network_pagePos)[7] <- 'Column.AD_SERVER_IMPRESSIONS'
+  names(network_geo)[5] <- 'Column.AD_SERVER_IMPRESSIONS'
+  
+  print("downloading non network delivery")
   del <- DFP_getDeliveryInfo(start_year = start_year, start_month = start_month, start_day = start_day, 
                              end_year = end_year, end_month = end_month, end_day = end_day)
   
-  DelByPagePos <- del$pagePos_data
-  DelByGeo <- del$geo_data
+  DelByPagePos <- rbind(del$pagePos_data,network_pagePos)
+  DelByGeo <- rbind(del$geo_data,network_geo)
   
   print("categorizing delivery")
   #make adjustments to DelByPagePos to fit OAS framework
