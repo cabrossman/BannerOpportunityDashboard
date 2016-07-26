@@ -1,22 +1,40 @@
-DFP_geoCat <- function(geo_data,geoInformation = NULL){
+DFP_geoCat <- function(geo_data = NULL,geoInformation = NULL){
+  
+  
+  
   if(is.null(geoInformation)){
     geoInformation <- DFP_getGeoInfo()
   }
   
-  x <- left_join(geo_data,geoInformation, by = c("Dimension.REGION_CRITERIA_ID" = "id")) %>% select(Country = countrycode)
+  if(is.null(geo_data)){
+    geo_data <- geoInformation
+    x <- geo_data %>% select(Country = countrycode)
+  } else {
+    x <- left_join(geo_data,geoInformation, by = c("Dimension.REGION_CRITERIA_ID" = "id")) %>% select(Country = countrycode)
+    geo_data
+    
+    for(i in 1:NCOL(geo_data)){
+      if(names(geo_data)[i] == 'Dimension.REGION_NAME'){
+        names(geo_data)[i] = 'name'
+      }
+    }
+    
+  }
+
+  
 
   geo_data$Country <- ifelse(is.na(x$Country),'UNKNOWN',x$Country)
   
   #this is some sort of problem for keboola, so renamiong
-  geo_data$Dimension.REGION_NAME <- ifelse(grepl('North Ossetia',geo_data$Dimension.REGION_NAME),'North Ossetia_Alania',geo_data$Dimension.REGION_NAME)
+  geo_data$name <- ifelse(grepl('North Ossetia',geo_data$name),'North Ossetia_Alania',geo_data$name)
 
-  geo_data$Geo <- ifelse(geo_data$Country == 'UNKNOWN','UNKNOWN',paste0(geo_data$Country," -- ",geo_data$Dimension.REGION_NAME))
+  geo_data$Geo <- ifelse(geo_data$Country == 'UNKNOWN','UNKNOWN',paste0(geo_data$Country," -- ",geo_data$name))
 
   geo_data$NoGeoExist <- ifelse(geo_data$Country == 'UNKNOWN',1,0)
   
   
-  
-  
+
+
   
   
   CA_EAST <- c('CA -- Quebec', 'CA -- Prince Edward Island', 'CA -- Ontario', 'CA -- Nova Scotia', 'CA -- Newfoundland And Labrador', 'CA -- New Brunswick','CA -- Newfoundland and Labrador')
@@ -33,13 +51,13 @@ DFP_geoCat <- function(geo_data,geoInformation = NULL){
   
 
   
-  Africa <- c('NG', 'DJ', 'CI', 'GH', 'SN', 'NA', 'TG', 'TN', 'DZ', 'SC', 'MU', 'KE', 'MA', 'BJ', 'MW', 'CD', 'ML', 'GM', 'MZ', 'TZ', 'AO', 'LY', 'GA', 'CM', 'UG', 'RE', 'BW', 'CV', 'TD', 'YT', 'SL', 'SD', 'ZW', 'GW', 'BI', 'GN', 'ZM', 'SZ', 'CG', 'RW', 'MR', 'CF', 'ET', 'SH', 'GQ', 'BF', 'SO', 'LS', 'NE', 'ST', 'ZA','ER','LR','KM')
+  Africa <- c('NG', 'DJ', 'CI', 'GH', 'SN', 'NA', 'TG', 'TN', 'DZ', 'SC', 'MU', 'KE', 'MA', 'BJ', 'MW', 'CD', 'ML', 'GM', 'MZ', 'TZ', 'AO', 'LY', 'GA', 'CM', 'UG', 'RE', 'BW', 'CV', 'TD', 'YT', 'SL', 'SD', 'ZW', 'GW', 'BI', 'GN', 'ZM', 'SZ', 'CG', 'RW', 'MR', 'CF', 'ET', 'SH', 'GQ', 'BF', 'SO', 'LS', 'NE', 'ST', 'ZA','ER','LR','KM','MG')
   Europe <- c('DE', 'GR', 'CZ', 'MC', 'FR', 'IE', 'UA', 'BE', 'LV', 'PL', 'BG', 'NL', 'GI', 'ES', 'ME', 'RS', 'PT', 'HR', 'MT', 'AT', 'RO', 'SK', 'HU', 'CH', 'EE', 'LT', 'LU', 'BA', 'IM', 'BY', 'DK', 'AX', 'GG', 'AL', 'MD', 'LI', 'JE', 'SM', 'MK', 'IS', 'AD', 'VA','FO','GL','IT','SI','SJ','XK')
-  FarEast <- c('JP', 'SG', 'IN', 'PK', 'CN', 'MY', 'TH', 'HK', 'ID', 'PH', 'VN', 'GE', 'TW', 'AF', 'MO', 'BD', 'KZ', 'AZ', 'MN', 'BN', 'KH', 'BT', 'MM', 'AM', 'IO', 'TM', 'TL', 'KG', 'LA', 'UZ', 'CX', 'TJ','KR')
+  FarEast <- c('JP', 'SG', 'IN', 'PK', 'CN', 'MY', 'TH', 'HK', 'ID', 'PH', 'VN', 'GE', 'TW', 'AF', 'MO', 'BD', 'KZ', 'AZ', 'MN', 'BN', 'KH', 'BT', 'MM', 'AM', 'IO', 'TM', 'TL', 'KG', 'LA', 'UZ', 'CX', 'TJ','KR','LK','MV','NP')
   NorthAmericaInt <- c('MQ', 'PA', 'AG', 'BM', 'BS', 'VI', 'VC', 'PR', 'TT', 'VG', 'MX', 'DO', 'GD', 'KY', 'CR', 'DM', 'AW', 'GT', 'GP', 'BZ', 'SV', 'BB', 'KN', 'AI', 'JM', 'LC', 'MS', 'NI', 'CU', 'HT', 'TC', 'HN')
-  Australiasia <- c('AU', 'NZ', 'NC', 'GU', 'PF', 'VU', 'FJ', 'PG', 'CK', 'MP', 'PW', 'TO', 'NU', 'SB', 'FM', 'KI', 'WF', 'TV', 'NR', 'WS', 'NF', 'AS')
+  Australiasia <- c('AU', 'NZ', 'NC', 'GU', 'PF', 'VU', 'FJ', 'PG', 'CK', 'MP', 'PW', 'TO', 'NU', 'SB', 'FM', 'KI', 'WF', 'TV', 'NR', 'WS', 'NF', 'AS','CC','HM','MH')
   MiddleEast <- c('BH', 'CY', 'EG', 'IR', 'IQ', 'IL', 'JO', 'KW', 'LB', 'OM', 'QA', 'SA', 'SY', 'TR', 'AE', 'YE','PS')
-  SouthAmerica <- c('EC', 'AR', 'VE', 'BR', 'CO', 'PE', 'UY', 'BO', 'CL', 'PY', 'SR', 'GY', 'GF', 'FK','BQ')
+  SouthAmerica <- c('EC', 'AR', 'VE', 'BR', 'CO', 'PE', 'UY', 'BO', 'CL', 'PY', 'SR', 'GY', 'GF', 'FK','BQ','GS')
   RussiaScandinavia <- c('FI', 'NO', 'RU', 'SE')
   UK <- c('GB')
   

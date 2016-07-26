@@ -6,11 +6,11 @@ DFP_getAllMarineLineItems <- function(){
 
       
       #get all line items
-      line_item_detail_Del <- dfp_getLineItemsByStatement(list(filterStatement=
-                                                                        list(query="WHERE status='DELIVERING'")))
+      line_item_detail_Del <- API_exponential_backoff_retry(dfp_getLineItemsByStatement(list(filterStatement=
+                                                                        list(query="WHERE status='DELIVERING'"))))
       
-      line_item_detail_notDel <- dfp_getLineItemsByStatement(list(filterStatement=
-                                                                 list(query="WHERE status<>'DELIVERING'")))
+      line_item_detail_notDel <- API_exponential_backoff_retry(dfp_getLineItemsByStatement(list(filterStatement=
+                                                                 list(query="WHERE status<>'DELIVERING'"))))
       
       
       allDelivering <- NULL

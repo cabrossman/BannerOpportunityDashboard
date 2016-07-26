@@ -56,7 +56,7 @@ DFP_Rolling30_Driver <- function(){
   
   #make adjustments to geo_data to fit OAS framework
   geoInformation <- DFP_getGeoInfo()
-  DelByGeo <- DFP_geoCat(DelByGeo,geoInformation)
+  DelByGeo <- DFP_geoCat(geo_data = DelByGeo,geoInformation = geoInformation)
   DelByGeo$salesgroup <- DFP_catSalesGroup(cbind.data.frame(Campaign = DelByGeo$Dimension.LINE_ITEM_NAME, Advertiser = DelByGeo$Dimension.ADVERTISER_NAME))
   names(DelByGeo)[1] <- 'campaign'; names(DelByGeo)[2] <- 'State'
   names(DelByGeo)[5] <- 'impByGeo'; names(DelByGeo)[6] <- 'Advertiser'

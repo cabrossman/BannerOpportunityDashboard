@@ -87,14 +87,14 @@ DFP_getDeliveryInfo <- function(
                                        )))
   }
   
-  getAdvertiserList_data <- dfp_full_report_wrapper(getAdvertiserList)
+  getAdvertiserList_data <- API_exponential_backoff_retry(dfp_full_report_wrapper(getAdvertiserList))
   names(getAdvertiserList_data)[3:5] <- c("drop1","drop2","drop3")
   
 
-  pagePos_data <- dfp_full_report_wrapper(pagePos_request)
+  pagePos_data <- API_exponential_backoff_retry(dfp_full_report_wrapper(pagePos_request))
   pagePos_data <- pagePos_data[grepl("^pos",pagePos_data$Dimension.CUSTOM_CRITERIA),]
   
-  geo_data <- dfp_full_report_wrapper(geo_request)
+  geo_data <- API_exponential_backoff_retry(dfp_full_report_wrapper(geo_request))
   
   geo_data2 <- geo_data %>% left_join(getAdvertiserList_data, by = "Dimension.LINE_ITEM_NAME") %>% dplyr::select(-drop1,-drop2,-drop3)
   pagePos_data2 <- pagePos_data %>% left_join(getAdvertiserList_data, by = "Dimension.LINE_ITEM_NAME") %>% dplyr::select(-drop1,-drop2,-drop3)
