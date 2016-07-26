@@ -4,7 +4,7 @@ OAS_catSalesGroup <- function(df){
   df$Passback <- ifelse(grepl("passback",tolower(df$Campaign)),1,0)
   df$Default <- ifelse(grepl("default",tolower(df$Campaign)),1,0)
   df$House <- ifelse(grepl("00001111",tolower(df$Advertiser)),1,0)
-  df$salesgroup <- ifelse(df$House > 0,"House",ifelse(df$Default > 0, "unknwon_default",ifelse(df$Passback >0, "Passback",ifelse(df$DDM > 0, "DDM", "Marine"))))
+  df$salesgroup <- ifelse(df$House > 0,"House",ifelse(df$Default > 0, "unknown_default",ifelse(df$Passback >0, "Passback",ifelse(df$DDM > 0, "DDM", "Marine"))))
   
 
                            
