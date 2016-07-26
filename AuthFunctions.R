@@ -9,6 +9,8 @@ suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
 suppressMessages(library(sqldf))
 suppressMessages(library(ggplot2))
+# suppressMessages(library(plyr))
+
 
 path <- 'C:\\Users\\christopher.brossman\\Documents\\R files\\R_Functions'
 file.sources = list.files(path,pattern = "*.R")
